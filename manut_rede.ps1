@@ -100,7 +100,7 @@ if ($reiniciar -eq 'S') {
     Start-Sleep -Seconds 2
     Restart-Computer -Force
 } else {
-    Write-Host "Operaçao concluída! O computador NAO sera reiniciado."
+    Write-Host "Operacao concluída! O computador NAO sera reiniciado."
 }
 
 # Pausas adicionais, se necessário
