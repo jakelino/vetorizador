@@ -1,0 +1,1 @@
+Enable PowerShell execution Set-ExecutionPolicy Unrestricted -Force
