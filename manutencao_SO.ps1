@@ -1,6 +1,6 @@
 # Certifique-se de rodar como Administrador!
 
-Write-Host "Executando CHKDSK (pode pedir para agendar no próximo boot)..."
+Write-Host "Executando CHKDSK (pode pedir para agendar no proximo boot)..."
 chkdsk /f /r /x c:
 
 Write-Host "Executando SFC /scannow..."
