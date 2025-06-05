@@ -2,7 +2,7 @@ Olá, gentalha!
 
 Os projetos estão todos aí em cima.
 Os scripts PowerShell só vão funcionar se antes, como ADM, executar esse comando: Enable PowerShell execution: Set-ExecutionPolicy Unrestricted -Force
-P.S.: os scripts também deverão ser executados como ADM.
+<br><br>P.S.: os scripts também deverão ser executados como ADM.
 
 Lista de Comandos/Scripts:
 
