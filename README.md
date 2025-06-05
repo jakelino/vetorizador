@@ -2,10 +2,11 @@ Olá, gentalha!
 
 Os projetos estão todos aí em cima.
 Os scripts PowerShell só vão funcionar se antes, como ADM, executar esse comando: Enable PowerShell execution: Set-ExecutionPolicy Unrestricted -Force
-<br><br>P.S.: os scripts também deverão ser executados como ADM.
-
+<br>P.S.: os scripts também deverão ser executados como ADM.
+<br>
+<br>
 Lista de Comandos/Scripts:
-
+<br>
 Scripts PS1 online Edu (nomes das funções estão nos próprio nomes dos arquivos)
 -------------------------------------------------------------------------------
 
