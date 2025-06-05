@@ -88,10 +88,10 @@ Write-Host "Quer reiniciar o PC?"
 Write-Host ""
 Write-Host ""
 
-# Menu interativo para reinício
+# Menu interativo para reinicio do PC
 $reiniciar = $null
 while ($reiniciar -notin @('S','N')) {
-    $reiniciar = Read-Host "Digite S para Sim ou N para Não"
+    $reiniciar = Read-Host "Digite S para Sim ou N para NAO"
     $reiniciar = $reiniciar.ToUpper()
 }
 
@@ -100,7 +100,7 @@ if ($reiniciar -eq 'S') {
     Start-Sleep -Seconds 2
     Restart-Computer -Force
 } else {
-    Write-Host "Operação concluída. O computador não será reiniciado."
+    Write-Host "Operaçao concluída! O computador NAO sera reiniciado."
 }
 
 # Pausas adicionais, se necessário
