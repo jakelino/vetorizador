@@ -30,6 +30,7 @@ header {
 header h1 {
     font-size: 2.5em;
     margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
 }
 
 header p {
@@ -63,16 +64,20 @@ header p {
     transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
+    background: #fafafa;
 }
 
 .upload-area:hover {
     border-color: #4CAF50;
     background-color: #f9f9f9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .upload-area.dragover {
     border-color: #4CAF50;
     background-color: #f0f8f0;
+    transform: scale(1.02);
 }
 
 .upload-content {
@@ -82,6 +87,7 @@ header p {
 .upload-icon {
     font-size: 3em;
     margin-bottom: 15px;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
 }
 
 #fileInput {
@@ -96,6 +102,10 @@ header p {
 
 .image-preview {
     margin-top: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .image-preview img {
@@ -103,6 +113,7 @@ header p {
     max-height: 200px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
 }
 
 .control-group {
@@ -119,17 +130,19 @@ header p {
 .control-group select,
 .control-group input[type="color"] {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 2px solid #ddd;
-    border-radius: 5px;
+    border-radius: 8px;
     font-size: 16px;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
+    background: white;
 }
 
 .control-group select:focus,
 .control-group input[type="color"]:focus {
     outline: none;
     border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
 }
 
 .slider-group {
@@ -139,8 +152,9 @@ header p {
 .slider-group label {
     display: block;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     color: #555;
+    font-size: 14px;
 }
 
 .slider-group input[type="range"] {
@@ -150,61 +164,81 @@ header p {
     background: #ddd;
     outline: none;
     -webkit-appearance: none;
+    transition: background 0.3s ease;
+}
+
+.slider-group input[type="range"]:hover {
+    background: #ccc;
 }
 
 .slider-group input[type="range"]::-webkit-slider-thumb {
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
-    background: #4CAF50;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.slider-group input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
 .slider-group input[type="range"]::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
-    background: #4CAF50;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
     cursor: pointer;
     border: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
 .action-section {
     padding: 30px;
     text-align: center;
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
 }
 
 .process-btn {
     background: linear-gradient(135deg, #2196F3, #1976D2);
     color: white;
     border: none;
-    padding: 15px 40px;
+    padding: 18px 45px;
     font-size: 1.2em;
     font-weight: bold;
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
     margin: 0 auto;
-    min-width: 200px;
+    min-width: 220px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .process-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4);
+    background: linear-gradient(135deg, #1976D2, #1565C0);
+}
+
+.process-btn:active {
+    transform: translateY(-1px);
 }
 
 .process-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
+    background: #ccc;
 }
 
 .loading-spinner {
@@ -222,32 +256,53 @@ header p {
 }
 
 .result-card {
-    background: #f8f9fa;
-    border-radius: 10px;
-    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 15px;
+    padding: 25px;
     text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .download-btn {
-    background: #4CAF50;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
     color: white;
     text-decoration: none;
-    padding: 12px 30px;
-    border-radius: 25px;
+    padding: 15px 35px;
+    border-radius: 30px;
     display: inline-block;
-    margin-top: 15px;
+    margin-top: 20px;
     font-weight: bold;
+    font-size: 1.1em;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .download-btn:hover {
-    background: #45a049;
+    background: linear-gradient(135deg, #45a049, #4CAF50);
     transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
 }
 
+/* Animações */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.section {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Responsividade */
 @media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    
     .container {
-        margin: 10px;
+        margin: 0;
         border-radius: 10px;
     }
     
@@ -266,4 +321,27 @@ header p {
     .upload-area {
         padding: 30px 20px;
     }
+    
+    .process-btn {
+        padding: 15px 30px;
+        font-size: 1.1em;
+        min-width: 180px;
+    }
+}
+
+/* Melhorias visuais */
+.slider-group input[type="range"]::-webkit-slider-track {
+    background: linear-gradient(to right, #4CAF50, #ddd);
+    height: 8px;
+    border-radius: 5px;
+}
+
+.control-group select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 40px;
+    appearance: none;
 }
