@@ -1,4 +1,4 @@
-<h1 align="center">🎨 Vetorizador</h1>
+<h1 align="center">🎨 Vetorizador do Jakelino</h1>
 
 <p align="center">
   Transforme imagens em vetores direto do navegador — com integração entre <strong>Python</strong> e <strong>Web</strong> via <a href="https://onrender.com">onrender.com</a>.
