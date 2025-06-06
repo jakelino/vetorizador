@@ -84,6 +84,11 @@
                     <label for="scale">Escala de Saída: <span id="scaleValue">1</span>x</label>
                     <input type="range" name="scale" id="scale" min="1" max="5" value="1">
                 </div>
+
+                <div class="slider-group">
+                    <label for="quality">Qualidade da imagem: <span id="qualityValue">80</span></label>
+                    <input type="range" name="quality" id="quality" min="1" max="100" value="80">
+                </div>
             </div>
 
             <!-- Configurações de Saída -->
@@ -96,7 +101,8 @@
                         <option value="svg">SVG (Vetor)</option>
                         <option value="png">PNG (Raster)</option>
                         <option value="jpg">JPG (Raster)</option>
-                        <option value="pdf">PDF (Vetor)</option>
+                        <option value="webp">WebP (Raster)</option>
+                        <option value="bmp">BMP (Raster)</option>
                     </select>
                 </div>
 
