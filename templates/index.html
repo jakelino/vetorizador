@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vetorizador Profissional Online</title>
-<link rel="manifest" href="/manifest.json">
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
@@ -15,7 +14,7 @@
         </header>
 
         <form id="vetorForm" enctype="multipart/form-data">
-            <!-- Seção de Upload -->
+            <!-- Upload -->
             <div class="section">
                 <h2>📁 Selecionar Arquivo</h2>
                 <div class="upload-area" id="uploadArea">
@@ -29,35 +28,35 @@
                 </div>
             </div>
 
-            <!-- Configurações de Vetorização -->
+            <!-- Vetorização -->
             <div class="section">
                 <h2>⚙️ Configurações de Vetorização</h2>
                 
                 <div class="control-group">
-                    <label for="vectorize_mode">Modo de Vetorização:</label>
+                    <label for="vectorize_mode">Modo:</label>
                     <select name="vectorize_mode" id="vectorize_mode">
-                        <option value="color">🎨 Colorido (Preserva cores originais)</option>
-                        <option value="bw">⚫ Preto e Branco (Binarização)</option>
+                        <option value="color">🎨 Colorido</option>
+                        <option value="bw">⚫ Preto e Branco</option>
                     </select>
                 </div>
 
                 <div class="slider-group">
-                    <label for="threshold">Limiar de Binarização: <span id="thresholdValue">128</span></label>
+                    <label for="threshold">Limiar: <span id="thresholdValue">128</span></label>
                     <input type="range" name="threshold" id="threshold" min="0" max="255" value="128">
                 </div>
 
                 <div class="slider-group">
-                    <label for="opacity">Opacidade Mínima (%): <span id="opacityValue">10</span></label>
+                    <label for="opacity">Opacidade (%): <span id="opacityValue">10</span></label>
                     <input type="range" name="opacity" id="opacity" min="0" max="100" value="10">
                 </div>
 
                 <div class="slider-group">
-                    <label for="grouping">Agrupamento Horizontal: <span id="groupingValue">1</span></label>
+                    <label for="grouping">Agrupamento: <span id="groupingValue">1</span></label>
                     <input type="range" name="grouping" id="grouping" min="1" max="50" value="1">
                 </div>
             </div>
 
-            <!-- Ajustes de Imagem -->
+            <!-- Ajustes -->
             <div class="section">
                 <h2>🎛️ Ajustes de Imagem</h2>
                 
@@ -82,37 +81,32 @@
                 </div>
 
                 <div class="slider-group">
-                    <label for="scale">Escala de Saída: <span id="scaleValue">1</span>x</label>
+                    <label for="scale">Escala: <span id="scaleValue">1</span>x</label>
                     <input type="range" name="scale" id="scale" min="1" max="5" value="1">
                 </div>
 
-                <!-- SLIDER DE QUALIDADE DESTACADO -->
+                <!-- QUALIDADE COM AVISO -->
                 <div class="slider-group quality-slider">
-                    <label for="quality">🎯 QUALIDADE DA IMAGEM: <span id="qualityValue">50</span>%</label>
-                    <input type="range" name="quality" id="quality" min="1" max="100" value="50" step="1">
-                    <div class="quality-indicator">
-                        <span class="quality-low">📉 Baixa (Arquivo menor)</span>
-                        <span class="quality-high">📈 Alta (Arquivo maior)</span>
-                    </div>
-                    <div class="quality-description" id="qualityDescription">
-                        Qualidade Média - Balance entre tamanho e definição
+                    <label for="quality">🎯 QUALIDADE: <span id="qualityValue">50</span>%</label>
+                    <input type="range" name="quality" id="quality" min="1" max="100" value="50">
+                    <div class="quality-info" id="qualityInfo">
+                        ⚠️ Para PNG: Reduz cores | Para JPG: Reduz qualidade
                     </div>
                 </div>
             </div>
 
-            <!-- Configurações de Saída -->
+            <!-- Saída -->
             <div class="section">
-                <h2>📤 Configurações de Saída</h2>
+                <h2>📤 Formato de Saída</h2>
                 
                 <div class="control-group">
-                    <label for="format">Formato de Saída:</label>
+                    <label for="format">Formato:</label>
                     <select name="format" id="format">
-                        <option value="png">PNG (Recomendado para qualidade)</option>
-                        <option value="jpg">JPG (Menor tamanho)</option>
-                        <option value="webp">WebP (Melhor compressão)</option>
-                        <option value="svg">SVG (Vetor escalável)</option>
-                        <option value="bmp">BMP (Sem compressão)</option>
-                        <option value="tiff">TIFF (Profissional)</option>
+                        <option value="jpg">JPG (Qualidade funciona)</option>
+                        <option value="png">PNG (Reduz cores)</option>
+                        <option value="webp">WebP (Qualidade funciona)</option>
+                        <option value="svg">SVG (Vetor)</option>
+                        <option value="bmp">BMP (Reduz cores)</option>
                     </select>
                 </div>
 
@@ -122,21 +116,17 @@
                 </div>
             </div>
 
-            <!-- Botão de Processamento -->
+            <!-- Botão -->
             <div class="action-section">
                 <button type="submit" id="processBtn" class="process-btn">
-                    <span class="btn-text">🚀 VETORIZAR IMAGEM</span>
+                    <span class="btn-text">🚀 VETORIZAR</span>
                     <div class="loading-spinner" style="display: none;"></div>
                 </button>
-                <div class="process-info" id="processInfo" style="display: none;">
-                    Processando com qualidade <span id="currentQuality">50</span>%...
-                </div>
             </div>
         </form>
 
-        <!-- Área de Resultado -->
+        <!-- Resultado -->
         <div id="resultSection" class="section" style="display: none;">
-            <h2>✅ Resultado da Vetorização</h2>
             <div id="resultContent"></div>
         </div>
     </div>
