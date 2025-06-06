@@ -36,6 +36,7 @@ def upload_file():
         contrast = float(request.form.get('contrast', 1.0))
         brightness = float(request.form.get('brightness', 1.0))
         saturation = float(request.form.get('saturation', 1.0))
+        quality = int(request.form.get('quality', 80))
         bg_color = request.form.get('bg_color', '#ffffff')
         output_format = request.form.get('format', 'svg').lower()
         vectorize_mode = request.form.get('vectorize_mode', 'color')
@@ -85,7 +86,18 @@ def upload_file():
             if vectorize_mode == 'bw':
                 img = img.convert('L').point(lambda x: 255 if x > threshold else 0, mode='1')
             
-            img.save(output, format=output_format.upper(), quality=95)
+            # Aplicar qualidade baseada no formato
+            if output_format in ['jpg', 'jpeg']:
+                img = img.convert('RGB')  # JPG não suporta transparência
+                img.save(output, format='JPEG', quality=quality, optimize=True)
+            elif output_format == 'png':
+                compress_level = max(0, min(9, int((100-quality)/10)))
+                img.save(output, format='PNG', compress_level=compress_level, optimize=True)
+            elif output_format == 'webp':
+                img.save(output, format='WEBP', quality=quality, method=6)
+            else:
+                img.save(output, format=output_format.upper(), quality=quality)
+            
             mimetype = f'image/{output_format}'
             ext = output_format
 
