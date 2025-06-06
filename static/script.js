@@ -27,6 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 let displayValue = this.value;
                 if (key === 'scale') {
                     displayValue += 'x';
+                } else if (key === 'quality') {
+                    displayValue += '%';
+                    // Adicionar feedback visual da qualidade
+                    updateQualityFeedback(this.value);
                 } else if (key === 'contrast' || key === 'brightness' || key === 'saturation') {
                     displayValue = parseFloat(this.value).toFixed(1);
                 }
@@ -34,6 +38,19 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+
+    function updateQualityFeedback(qualityValue) {
+        const qualitySlider = document.querySelector('.quality-slider');
+        qualitySlider.classList.remove('quality-low', 'quality-medium', 'quality-high');
+        
+        if (qualityValue <= 30) {
+            qualitySlider.classList.add('quality-low');
+        } else if (qualityValue <= 70) {
+            qualitySlider.classList.add('quality-medium');
+        } else {
+            qualitySlider.classList.add('quality-high');
+        }
+    }
 
     // Drag and drop functionality
     uploadArea.addEventListener('dragover', function(e) {
@@ -109,6 +126,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const formData = new FormData(form);
         
+        // Debug: mostrar valores enviados
+        console.log('Valores sendo enviados:');
+        for (let [key, value] of formData.entries()) {
+            console.log(key + ': ' + value);
+        }
+        
         // Mostrar loading
         processBtn.disabled = true;
         processBtn.querySelector('.btn-text').textContent = 'Processando...';
@@ -143,6 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div style="margin: 20px 0; text-align: left;">
                         <p><strong>📄 Arquivo:</strong> ${filename}</p>
                         <p><strong>💾 Tamanho:</strong> ${fileSize} MB</p>
+                        <p><strong>🎯 Qualidade aplicada:</strong> ${document.getElementById('quality').value}%</p>
                         <p><strong>🕒 Processado em:</strong> ${new Date().toLocaleTimeString()}</p>
                     </div>
                     <a href="${url}" download="${filename}" class="download-btn">
@@ -170,31 +194,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return `${baseName}_vetorizado.${format}`;
     }
 
-    // Animações suaves
-    function animateValue(element, start, end, duration) {
-        let startTimestamp = null;
-        const step = (timestamp) => {
-            if (!startTimestamp) startTimestamp = timestamp;
-            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            element.textContent = Math.floor(progress * (end - start) + start);
-            if (progress < 1) {
-                window.requestAnimationFrame(step);
-            }
-        };
-        window.requestAnimationFrame(step);
-    }
-
-    // Adicionar efeitos visuais aos sliders
-    Object.keys(sliders).forEach(key => {
-        const { slider } = sliders[key];
-        if (slider) {
-            slider.addEventListener('mousedown', function() {
-                this.style.transform = 'scale(1.02)';
-            });
-            
-            slider.addEventListener('mouseup', function() {
-                this.style.transform = 'scale(1)';
-            });
-        }
-    });
+    // Inicializar feedback da qualidade
+    updateQualityFeedback(80);
 });
