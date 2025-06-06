@@ -3,134 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vetorizador Profissional Online</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Vetorizador Profissional</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        .slider-group {
+            margin-bottom: 20px;
+        }
+        .slider-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .slider-group input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+        .value-display {
+            background: #007bff;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-primary {
+            background: #28a745;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+        }
+        .btn-primary:hover {
+            background: #218838;
+        }
+        select, input[type="color"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #e8f5e8;
+            border-radius: 8px;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🎨 Vetorizador Profissional Online</h1>
-            <p>Transforme suas imagens em vetores de alta qualidade</p>
-        </header>
-
-        <form id="vetorForm" enctype="multipart/form-data">
-            <!-- Upload -->
+        <h1>🎨 Vetorizador de Imagens</h1>
+        
+        <form id="uploadForm" enctype="multipart/form-data">
+            <!-- UPLOAD -->
             <div class="section">
-                <h2>📁 Selecionar Arquivo</h2>
-                <div class="upload-area" id="uploadArea">
+                <h3>📁 Selecionar Arquivo</h3>
+                <div class="upload-area">
                     <input type="file" name="file" id="fileInput" accept="image/*" required>
-                    <div class="upload-content">
-                        <div class="upload-icon">📸</div>
-                        <p>Clique para selecionar ou arraste uma imagem</p>
-                        <small>Formatos: PNG, JPG, JPEG, BMP, GIF, TIFF, WEBP (Máx: 16MB)</small>
-                    </div>
-                    <div id="imagePreview" class="image-preview" style="display: none;"></div>
+                    <button type="button" class="btn" onclick="document.getElementById('fileInput').click()">
+                        Selecionar Imagem
+                    </button>
+                    <div id="fileName" style="margin-top: 10px; color: #666;"></div>
                 </div>
             </div>
 
-            <!-- Vetorização -->
+            <!-- SLIDERS DE QUALIDADE E CONFIGURAÇÕES -->
             <div class="section">
-                <h2>⚙️ Configurações de Vetorização</h2>
+                <h3>🎛️ Configurações</h3>
                 
-                <div class="control-group">
-                    <label for="vectorize_mode">Modo:</label>
-                    <select name="vectorize_mode" id="vectorize_mode">
-                        <option value="color">🎨 Colorido</option>
-                        <option value="bw">⚫ Preto e Branco</option>
-                    </select>
+                <!-- SLIDER DE QUALIDADE PRINCIPAL -->
+                <div class="slider-group">
+                    <label for="quality">🎯 QUALIDADE DA IMAGEM: <span class="value-display" id="qualityValue">50</span>%</label>
+                    <input type="range" name="quality" id="quality" min="1" max="100" value="50">
                 </div>
 
                 <div class="slider-group">
-                    <label for="threshold">Limiar: <span id="thresholdValue">128</span></label>
+                    <label for="threshold">Limiar de Binarização: <span class="value-display" id="thresholdValue">128</span></label>
                     <input type="range" name="threshold" id="threshold" min="0" max="255" value="128">
                 </div>
 
                 <div class="slider-group">
-                    <label for="opacity">Opacidade (%): <span id="opacityValue">10</span></label>
+                    <label for="opacity">Opacidade Mínima: <span class="value-display" id="opacityValue">10</span>%</label>
                     <input type="range" name="opacity" id="opacity" min="0" max="100" value="10">
                 </div>
 
                 <div class="slider-group">
-                    <label for="grouping">Agrupamento: <span id="groupingValue">1</span></label>
+                    <label for="grouping">Agrupamento: <span class="value-display" id="groupingValue">1</span></label>
                     <input type="range" name="grouping" id="grouping" min="1" max="50" value="1">
                 </div>
-            </div>
 
-            <!-- Ajustes -->
-            <div class="section">
-                <h2>🎛️ Ajustes de Imagem</h2>
-                
                 <div class="slider-group">
-                    <label for="contrast">Contraste: <span id="contrastValue">1.0</span></label>
+                    <label for="contrast">Contraste: <span class="value-display" id="contrastValue">1.0</span></label>
                     <input type="range" name="contrast" id="contrast" min="0.1" max="3.0" step="0.1" value="1.0">
                 </div>
 
                 <div class="slider-group">
-                    <label for="brightness">Brilho: <span id="brightnessValue">1.0</span></label>
+                    <label for="brightness">Brilho: <span class="value-display" id="brightnessValue">1.0</span></label>
                     <input type="range" name="brightness" id="brightness" min="0.1" max="3.0" step="0.1" value="1.0">
                 </div>
 
                 <div class="slider-group">
-                    <label for="saturation">Saturação: <span id="saturationValue">1.0</span></label>
-                    <input type="range" name="saturation" id="saturation" min="0.0" max="3.0" step="0.1" value="1.0">
-                </div>
-
-                <div class="slider-group">
-                    <label for="smooth">Suavização: <span id="smoothValue">0</span></label>
-                    <input type="range" name="smooth" id="smooth" min="0" max="10" value="0">
-                </div>
-
-                <div class="slider-group">
-                    <label for="scale">Escala: <span id="scaleValue">1</span>x</label>
+                    <label for="scale">Escala: <span class="value-display" id="scaleValue">1</span>x</label>
                     <input type="range" name="scale" id="scale" min="1" max="5" value="1">
-                </div>
-
-                <!-- QUALIDADE COM AVISO -->
-                <div class="slider-group quality-slider">
-                    <label for="quality">🎯 QUALIDADE: <span id="qualityValue">50</span>%</label>
-                    <input type="range" name="quality" id="quality" min="1" max="100" value="50">
-                    <div class="quality-info" id="qualityInfo">
-                        ⚠️ Para PNG: Reduz cores | Para JPG: Reduz qualidade
-                    </div>
                 </div>
             </div>
 
-            <!-- Saída -->
+            <!-- FORMATO DE SAÍDA -->
             <div class="section">
-                <h2>📤 Formato de Saída</h2>
-                
-                <div class="control-group">
+                <h3>📤 Formato de Saída</h3>
+                <div style="margin-bottom: 15px;">
                     <label for="format">Formato:</label>
                     <select name="format" id="format">
-                        <option value="jpg">JPG (Qualidade funciona)</option>
-                        <option value="png">PNG (Reduz cores)</option>
-                        <option value="webp">WebP (Qualidade funciona)</option>
-                        <option value="svg">SVG (Vetor)</option>
-                        <option value="bmp">BMP (Reduz cores)</option>
+                        <option value="jpg">JPG (Recomendado para qualidade)</option>
+                        <option value="png">PNG</option>
+                        <option value="webp">WebP</option>
+                        <option value="svg">SVG</option>
                     </select>
                 </div>
-
-                <div class="control-group">
+                <div>
                     <label for="bg_color">Cor de Fundo:</label>
                     <input type="color" name="bg_color" id="bg_color" value="#ffffff">
                 </div>
             </div>
 
-            <!-- Botão -->
-            <div class="action-section">
-                <button type="submit" id="processBtn" class="process-btn">
-                    <span class="btn-text">🚀 VETORIZAR</span>
-                    <div class="loading-spinner" style="display: none;"></div>
-                </button>
-            </div>
+            <!-- BOTÃO DE ENVIO -->
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                🚀 VETORIZAR IMAGEM
+            </button>
         </form>
 
-        <!-- Resultado -->
-        <div id="resultSection" class="section" style="display: none;">
-            <div id="resultContent"></div>
-        </div>
+        <!-- RESULTADO -->
+        <div id="result"></div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // CONFIGURAR TODOS OS SLIDERS
+        const sliders = [
+            { id: 'quality', valueId: 'qualityValue', suffix: '%' },
+            { id: 'threshold', valueId: 'thresholdValue', suffix: '' },
+            { id: 'opacity', valueId: 'opacityValue', suffix: '%' },
+            { id: 'grouping', valueId: 'groupingValue', suffix: '' },
+            { id: 'contrast', valueId: 'contrastValue', suffix: '' },
+            { id: 'brightness', valueId: 'brightnessValue', suffix: '' },
+            { id: 'scale', valueId: 'scaleValue', suffix: 'x' }
+        ];
+
+        // CONECTAR CADA SLIDER AO SEU DISPLAY
+        sliders.forEach(slider => {
+            const input = document.getElementById(slider.id);
+            const display = document.getElementById(slider.valueId);
+            
+            if (input && display) {
+                input.addEventListener('input', function() {
+                    let value = this.value;
+                    if (slider.id === 'contrast' || slider.id === 'brightness') {
+                        value = parseFloat(value).toFixed(1);
+                    }
+                    display.textContent = value + slider.suffix;
+                });
+            }
+        });
+
+        // MOSTRAR NOME DO ARQUIVO
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const fileName = document.getElementById('fileName');
+            if (e.target.files.length > 0) {
+                fileName.textContent = '📁 ' + e.target.files[0].name;
+            }
+        });
+
+        // ENVIO DO FORMULÁRIO
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files[0]) {
+                alert('Por favor, selecione uma imagem!');
+                return;
+            }
+
+            const formData = new FormData(this);
+            const submitBtn = document.getElementById('submitBtn');
+            const result = document.getElementById('result');
+            
+            // MOSTRAR LOADING
+            submitBtn.textContent = '⏳ PROCESSANDO...';
+            submitBtn.disabled = true;
+
+            // DEBUG: Mostrar valores sendo enviados
+            console.log('Valores enviados:');
+            for (let [key, value] of formData.entries()) {
+                console.log(key + ': ' + value);
+            }
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                }
+                throw new Error('Erro no processamento');
+            })
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const filename = getFilename(fileInput.files[0].name);
+                const size = (blob.size / 1024 / 1024).toFixed(2);
+                const quality = document.getElementById('quality').value;
+
+                result.innerHTML = `
+                    <h3>✅ Sucesso!</h3>
+                    <p><strong>Arquivo:</strong> ${filename}</p>
+                    <p><strong>Tamanho:</strong> ${size} MB</p>
+                    <p><strong>Qualidade aplicada:</strong> ${quality}%</p>
+                    <a href="${url}" download="${filename}" class="btn">📥 Download</a>
+                `;
+                result.style.display = 'block';
+            })
+            .catch(error => {
+                result.innerHTML = `<h3>❌ Erro:</h3><p>${error.message}</p>`;
+                result.style.display = 'block';
+            })
+            .finally(() => {
+                submitBtn.textContent = '🚀 VETORIZAR IMAGEM';
+                submitBtn.disabled = false;
+            });
+        });
+
+        function getFilename(originalName) {
+            const quality = document.getElementById('quality').value;
+            const format = document.getElementById('format').value;
+            const baseName = originalName.split('.').slice(0, -1).join('.');
+            return `${baseName}_q${quality}.${format}`;
+        }
+    </script>
 </body>
 </html>
