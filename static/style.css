@@ -197,39 +197,52 @@ header p {
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-/* Estilo especial para o slider de qualidade */
+/* ESTILO ESPECIAL PARA O SLIDER DE QUALIDADE */
 .quality-slider {
-    border: 2px solid #2196F3;
-    border-radius: 10px;
-    padding: 15px;
-    background: linear-gradient(135deg, #e3f2fd, #ffffff);
+    border: 3px solid #FF5722;
+    border-radius: 15px;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff3e0, #ffffff);
+    margin: 30px 0;
+    box-shadow: 0 8px 20px rgba(255, 87, 34, 0.2);
 }
 
 .quality-slider label {
-    color: #1976D2;
-    font-size: 16px;
+    color: #FF5722;
+    font-size: 18px;
+    font-weight: bold;
     margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .quality-slider input[type="range"] {
-    background: linear-gradient(to right, #f44336 0%, #ff9800 25%, #ffc107 50%, #4caf50 75%, #2196f3 100%);
-    height: 10px;
+    background: linear-gradient(to right, 
+        #f44336 0%, 
+        #ff5722 20%, 
+        #ff9800 40%, 
+        #ffc107 60%, 
+        #4caf50 80%, 
+        #2196f3 100%);
+    height: 12px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .quality-slider input[type="range"]::-webkit-slider-thumb {
-    background: linear-gradient(135deg, #2196F3, #1976D2);
-    width: 24px;
-    height: 24px;
-    border: 2px solid white;
-    box-shadow: 0 3px 8px rgba(33, 150, 243, 0.4);
+    background: linear-gradient(135deg, #FF5722, #E64A19);
+    width: 26px;
+    height: 26px;
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(255, 87, 34, 0.5);
 }
 
 .quality-indicator {
     display: flex;
     justify-content: space-between;
-    margin-top: 8px;
+    margin-top: 10px;
     font-size: 12px;
-    color: #666;
+    font-weight: bold;
 }
 
 .quality-low {
@@ -240,6 +253,16 @@ header p {
     color: #4caf50;
 }
 
+.quality-description {
+    text-align: center;
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(255, 87, 34, 0.1);
+    border-radius: 8px;
+    font-weight: bold;
+    color: #FF5722;
+}
+
 .action-section {
     padding: 30px;
     text-align: center;
@@ -247,34 +270,34 @@ header p {
 }
 
 .process-btn {
-    background: linear-gradient(135deg, #2196F3, #1976D2);
+    background: linear-gradient(135deg, #FF5722, #E64A19);
     color: white;
     border: none;
-    padding: 18px 45px;
-    font-size: 1.2em;
+    padding: 20px 50px;
+    font-size: 1.3em;
     font-weight: bold;
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);
+    box-shadow: 0 8px 25px rgba(255, 87, 34, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 15px;
     margin: 0 auto;
-    min-width: 220px;
+    min-width: 250px;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
 }
 
 .process-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4);
-    background: linear-gradient(135deg, #1976D2, #1565C0);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(255, 87, 34, 0.5);
+    background: linear-gradient(135deg, #E64A19, #D84315);
 }
 
 .process-btn:active {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
 }
 
 .process-btn:disabled {
@@ -284,11 +307,18 @@ header p {
     background: #ccc;
 }
 
+.process-info {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #666;
+    font-weight: bold;
+}
+
 .loading-spinner {
-    width: 20px;
-    height: 20px;
-    border: 2px solid #ffffff40;
-    border-top: 2px solid white;
+    width: 24px;
+    height: 24px;
+    border: 3px solid #ffffff40;
+    border-top: 3px solid white;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -301,41 +331,31 @@ header p {
 .result-card {
     background: linear-gradient(135deg, #f8f9fa, #e9ecef);
     border-radius: 15px;
-    padding: 25px;
+    padding: 30px;
     text-align: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
 }
 
 .download-btn {
     background: linear-gradient(135deg, #4CAF50, #45a049);
     color: white;
     text-decoration: none;
-    padding: 15px 35px;
+    padding: 18px 40px;
     border-radius: 30px;
     display: inline-block;
-    margin-top: 20px;
+    margin-top: 25px;
     font-weight: bold;
-    font-size: 1.1em;
+    font-size: 1.2em;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 6px 16px rgba(76, 175, 80, 0.3);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
 .download-btn:hover {
     background: linear-gradient(135deg, #45a049, #4CAF50);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
-}
-
-/* Animações */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.section {
-    animation: fadeIn 0.5s ease-out;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
 }
 
 /* Responsividade */
@@ -368,7 +388,7 @@ header p {
     .process-btn {
         padding: 15px 30px;
         font-size: 1.1em;
-        min-width: 180px;
+        min-width: 200px;
     }
 }
 
