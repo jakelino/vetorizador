@@ -1,16 +1,16 @@
-from flask import Flask, render_template, request, send_file
-from PIL import Image
+from flask import Flask, render_template, request, send_file, jsonify
+from PIL import Image, ImageFilter, ImageEnhance
 import io
 import os
+import base64
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'bmp', 'gif'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'bmp', 'gif', 'tiff', 'webp'}
 
-def allowed_file(filename):                                                                                        
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/', methods=['GET'])
 def index():
@@ -19,77 +19,165 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
-        return {'error': 'Nenhum arquivo enviado'}, 400
+        return jsonify({'error': 'Nenhum arquivo enviado'}), 400
         
     file = request.files['file']
-    output_format = request.form.get('format', 'png').lower()
     
-    if file and allowed_file(file.filename):
-        try:
-            # Processar imagem
-            img = Image.open(file.stream).convert('RGBA')
-            width, height = img.size
-            
-            # Vetorização básica (binarização)
-            threshold = 128
-            img_processed = img.convert('L').point(lambda x: 255 if x > threshold else 0, mode='1')
-            
-            # Preparar saída
-            output = io.BytesIO()
-            
-            if output_format == 'svg':
-                # Gerar SVG otimizado
-                svg_content = self.gerar_svg(img_processed)
-                output.write(svg_content.encode('utf-8'))
-                mimetype = 'image/svg+xml'
-                ext = 'svg'
-            else:
-                img_processed.save(output, format=output_format.upper())
-                mimetype = f'image/{output_format}'
-                ext = output_format
-            
-            output.seek(0)
-            
-            # Nome do arquivo de saída
-            filename_base = os.path.splitext(file.filename)[0]
-            output_filename = f'{filename_base}_vetorizado.{ext}'
-            
-            return send_file(
-                output,
-                mimetype=mimetype,
-                download_name=output_filename
-            )
-            
-        except Exception as e:
-            return {'error': f'Erro no processamento: {str(e)}'}, 500
-    
-    return {'error': 'Tipo de arquivo não permitido'}, 400
+    if not (file and allowed_file(file.filename)):
+        return jsonify({'error': 'Tipo de arquivo não permitido'}), 400
 
-def gerar_svg(img):
+    try:
+        # Parâmetros dos controles
+        threshold = int(request.form.get('threshold', 128))
+        opacity_min = int(request.form.get('opacity', 10))
+        grouping = int(request.form.get('grouping', 1))
+        smooth = int(request.form.get('smooth', 0))
+        scale = int(request.form.get('scale', 1))
+        contrast = float(request.form.get('contrast', 1.0))
+        brightness = float(request.form.get('brightness', 1.0))
+        saturation = float(request.form.get('saturation', 1.0))
+        bg_color = request.form.get('bg_color', '#ffffff')
+        output_format = request.form.get('format', 'svg').lower()
+        vectorize_mode = request.form.get('vectorize_mode', 'color')
+
+        # Processar imagem
+        img = Image.open(file.stream).convert('RGBA')
+        
+        # Aplicar melhorias de imagem
+        if contrast != 1.0:
+            enhancer = ImageEnhance.Contrast(img)
+            img = enhancer.enhance(contrast)
+            
+        if brightness != 1.0:
+            enhancer = ImageEnhance.Brightness(img)
+            img = enhancer.enhance(brightness)
+            
+        if saturation != 1.0:
+            enhancer = ImageEnhance.Color(img)
+            img = enhancer.enhance(saturation)
+        
+        # Aplicar suavização
+        if smooth > 0:
+            img = img.filter(ImageFilter.GaussianBlur(radius=smooth/3))
+        
+        # Aplicar escala
+        if scale > 1:
+            new_width = img.width * scale
+            new_height = img.height * scale
+            img = img.resize((new_width, new_height), Image.LANCZOS)
+
+        # Gerar saída baseada no formato
+        output = io.BytesIO()
+        
+        if output_format == 'svg':
+            svg_content = image_to_svg_advanced(img, {
+                'threshold': threshold,
+                'opacity_min': opacity_min,
+                'grouping': grouping,
+                'bg_color': bg_color,
+                'mode': vectorize_mode
+            })
+            output.write(svg_content.encode('utf-8'))
+            mimetype = 'image/svg+xml'
+            ext = 'svg'
+        else:
+            # Para outros formatos, aplicar processamento
+            if vectorize_mode == 'bw':
+                img = img.convert('L').point(lambda x: 255 if x > threshold else 0, mode='1')
+            
+            img.save(output, format=output_format.upper(), quality=95)
+            mimetype = f'image/{output_format}'
+            ext = output_format
+
+        output.seek(0)
+        
+        # Nome do arquivo de saída
+        filename_base = os.path.splitext(file.filename)[0]
+        output_filename = f'{filename_base}_vetorizado.{ext}'
+        
+        return send_file(
+            output,
+            mimetype=mimetype,
+            download_name=output_filename,
+            as_attachment=True
+        )
+        
+    except Exception as e:
+        return jsonify({'error': f'Erro no processamento: {str(e)}'}), 500
+
+def image_to_svg_advanced(img, params):
     width, height = img.size
+    pixels = img.load()
+    
     svg_elements = []
     
-    for y in range(height):
-        x = 0
-        while x < width:
-            pixel = img.getpixel((x, y))
-            if pixel == 0:  # Pixel preto
-                start_x = x
-                while x < width and img.getpixel((x, y)) == 0:
-                    x += 1
-                width_rect = x - start_x
-                svg_elements.append(
-                    f'<rect x="{start_x}" y="{y}" width="{width_rect}" height="1" fill="#000000"/>'
-                )
-            else:
-                x += 1
+    # Adicionar fundo
+    svg_elements.append(f'<rect width="{width}" height="{height}" fill="{params["bg_color"]}"/>')
     
-    return (
+    if params['mode'] == 'color':
+        # Vetorização colorida
+        for y in range(height):
+            x = 0
+            while x < width:
+                r, g, b, a = pixels[x, y]
+                
+                # Filtrar por opacidade mínima
+                if a < (params['opacity_min'] * 255 / 100):
+                    x += 1
+                    continue
+                
+                # Agrupamento horizontal
+                start_x = x
+                current_color = (r, g, b, a)
+                group_count = 0
+                
+                while (x < width and 
+                       pixels[x, y] == current_color and 
+                       group_count < params['grouping']):
+                    x += 1
+                    group_count += 1
+                
+                # Adicionar retângulo colorido
+                hex_color = f'#{r:02x}{g:02x}{b:02x}'
+                opacity = a / 255.0
+                rect_width = x - start_x
+                
+                svg_elements.append(
+                    f'<rect x="{start_x}" y="{y}" width="{rect_width}" height="1" '
+                    f'fill="{hex_color}" fill-opacity="{opacity:.3f}"/>'
+                )
+    
+    else:  # modo preto e branco
+        img_bw = img.convert('L')
+        pixels_bw = img_bw.load()
+        
+        for y in range(height):
+            x = 0
+            while x < width:
+                pixel_value = pixels_bw[x, y]
+                
+                if pixel_value <= params['threshold']:
+                    start_x = x
+                    while x < width and pixels_bw[x, y] <= params['threshold']:
+                        x += 1
+                    
+                    rect_width = x - start_x
+                    svg_elements.append(
+                        f'<rect x="{start_x}" y="{y}" width="{rect_width}" height="1" fill="#000000"/>'
+                    )
+                else:
+                    x += 1
+    
+    # Construir SVG completo
+    svg_content = (
         f'<svg xmlns="http://www.w3.org/2000/svg" '
         f'width="{width}" height="{height}" '
-        f'shape-rendering="crispEdges">\n'
-        + '\n'.join(svg_elements) + '\n</svg>'
+        f'shape-rendering="crispEdges">\n' +
+        '\n'.join(svg_elements) +
+        '\n</svg>'
     )
+    
+    return svg_content
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
