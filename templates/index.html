@@ -16,27 +16,27 @@
         <form id="vetorForm" enctype="multipart/form-data">
             <!-- Seção de Upload -->
             <div class="section">
-                <h2>📁 Arquivo</h2>
+                <h2>📁 Selecionar Arquivo</h2>
                 <div class="upload-area" id="uploadArea">
                     <input type="file" name="file" id="fileInput" accept="image/*" required>
                     <div class="upload-content">
                         <div class="upload-icon">📸</div>
                         <p>Clique para selecionar ou arraste uma imagem</p>
-                        <small>Formatos suportados: PNG, JPG, JPEG, BMP, GIF, TIFF, WEBP</small>
+                        <small>Formatos: PNG, JPG, JPEG, BMP, GIF, TIFF, WEBP (Máx: 16MB)</small>
                     </div>
                     <div id="imagePreview" class="image-preview" style="display: none;"></div>
                 </div>
             </div>
 
-            <!-- Controles de Vetorização -->
+            <!-- Configurações de Vetorização -->
             <div class="section">
                 <h2>⚙️ Configurações de Vetorização</h2>
                 
                 <div class="control-group">
                     <label for="vectorize_mode">Modo de Vetorização:</label>
                     <select name="vectorize_mode" id="vectorize_mode">
-                        <option value="color">Colorido (Preserva cores originais)</option>
-                        <option value="bw">Preto e Branco (Binarização)</option>
+                        <option value="color">🎨 Colorido (Preserva cores originais)</option>
+                        <option value="bw">⚫ Preto e Branco (Binarização)</option>
                     </select>
                 </div>
 
@@ -56,7 +56,7 @@
                 </div>
             </div>
 
-            <!-- Controles de Imagem -->
+            <!-- Ajustes de Imagem -->
             <div class="section">
                 <h2>🎛️ Ajustes de Imagem</h2>
                 
@@ -85,12 +85,16 @@
                     <input type="range" name="scale" id="scale" min="1" max="5" value="1">
                 </div>
 
+                <!-- SLIDER DE QUALIDADE DESTACADO -->
                 <div class="slider-group quality-slider">
-                    <label for="quality">🎯 Qualidade da imagem: <span id="qualityValue">80</span>%</label>
-                    <input type="range" name="quality" id="quality" min="1" max="100" value="80">
+                    <label for="quality">🎯 QUALIDADE DA IMAGEM: <span id="qualityValue">50</span>%</label>
+                    <input type="range" name="quality" id="quality" min="1" max="100" value="50" step="1">
                     <div class="quality-indicator">
-                        <span class="quality-low">Baixa</span>
-                        <span class="quality-high">Alta</span>
+                        <span class="quality-low">📉 Baixa (Arquivo menor)</span>
+                        <span class="quality-high">📈 Alta (Arquivo maior)</span>
+                    </div>
+                    <div class="quality-description" id="qualityDescription">
+                        Qualidade Média - Balance entre tamanho e definição
                     </div>
                 </div>
             </div>
@@ -102,12 +106,12 @@
                 <div class="control-group">
                     <label for="format">Formato de Saída:</label>
                     <select name="format" id="format">
-                        <option value="svg">SVG (Vetor)</option>
-                        <option value="png">PNG (Raster)</option>
-                        <option value="jpg">JPG (Raster)</option>
-                        <option value="webp">WebP (Raster)</option>
-                        <option value="bmp">BMP (Raster)</option>
-                        <option value="tiff">TIFF (Raster)</option>
+                        <option value="png">PNG (Recomendado para qualidade)</option>
+                        <option value="jpg">JPG (Menor tamanho)</option>
+                        <option value="webp">WebP (Melhor compressão)</option>
+                        <option value="svg">SVG (Vetor escalável)</option>
+                        <option value="bmp">BMP (Sem compressão)</option>
+                        <option value="tiff">TIFF (Profissional)</option>
                     </select>
                 </div>
 
@@ -120,15 +124,18 @@
             <!-- Botão de Processamento -->
             <div class="action-section">
                 <button type="submit" id="processBtn" class="process-btn">
-                    <span class="btn-text">🚀 Vetorizar Imagem</span>
+                    <span class="btn-text">🚀 VETORIZAR IMAGEM</span>
                     <div class="loading-spinner" style="display: none;"></div>
                 </button>
+                <div class="process-info" id="processInfo" style="display: none;">
+                    Processando com qualidade <span id="currentQuality">50</span>%...
+                </div>
             </div>
         </form>
 
         <!-- Área de Resultado -->
         <div id="resultSection" class="section" style="display: none;">
-            <h2>✅ Resultado</h2>
+            <h2>✅ Resultado da Vetorização</h2>
             <div id="resultContent"></div>
         </div>
     </div>
