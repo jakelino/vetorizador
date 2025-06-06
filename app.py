@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, send_file, jsonify
 from PIL import Image, ImageFilter, ImageEnhance
 import io
 import os
-import base64
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
@@ -36,10 +35,12 @@ def upload_file():
         contrast = float(request.form.get('contrast', 1.0))
         brightness = float(request.form.get('brightness', 1.0))
         saturation = float(request.form.get('saturation', 1.0))
-        quality = int(request.form.get('quality', 80))
+        quality = int(request.form.get('quality', 80))  # CORREÇÃO AQUI
         bg_color = request.form.get('bg_color', '#ffffff')
         output_format = request.form.get('format', 'svg').lower()
         vectorize_mode = request.form.get('vectorize_mode', 'color')
+
+        print(f"QUALIDADE RECEBIDA: {quality}")  # Debug
 
         # Processar imagem
         img = Image.open(file.stream).convert('RGBA')
@@ -86,18 +87,54 @@ def upload_file():
             if vectorize_mode == 'bw':
                 img = img.convert('L').point(lambda x: 255 if x > threshold else 0, mode='1')
             
-            # Aplicar qualidade baseada no formato
+            # CORREÇÃO PRINCIPAL: Aplicar qualidade corretamente baseada no formato
             if output_format in ['jpg', 'jpeg']:
-                img = img.convert('RGB')  # JPG não suporta transparência
+                # JPG não suporta transparência
+                if img.mode in ('RGBA', 'LA', 'P'):
+                    # Criar fundo branco para transparência
+                    background = Image.new('RGB', img.size, (255, 255, 255))
+                    if img.mode == 'P':
+                        img = img.convert('RGBA')
+                    background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+                    img = background
+                
                 img.save(output, format='JPEG', quality=quality, optimize=True)
+                print(f"JPG salvo com qualidade: {quality}")  # Debug
+                
             elif output_format == 'png':
-                compress_level = max(0, min(9, int((100-quality)/10)))
+                # PNG usa compress_level (0-9), convertemos de quality (1-100)
+                # quality 1-100 -> compress_level 9-0 (invertido)
+                compress_level = max(0, min(9, int((100 - quality) / 11)))
                 img.save(output, format='PNG', compress_level=compress_level, optimize=True)
+                print(f"PNG salvo com compress_level: {compress_level} (quality: {quality})")  # Debug
+                
             elif output_format == 'webp':
-                img.save(output, format='WEBP', quality=quality, method=6)
+                img.save(output, format='WEBP', quality=quality, method=6, lossless=(quality >= 95))
+                print(f"WebP salvo com qualidade: {quality}")  # Debug
+                
+            elif output_format == 'bmp':
+                # BMP não tem compressão, converter para RGB se necessário
+                if img.mode in ('RGBA', 'LA'):
+                    background = Image.new('RGB', img.size, (255, 255, 255))
+                    background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+                    img = background
+                img.save(output, format='BMP')
+                print(f"BMP salvo (sem compressão)")  # Debug
+                
+            elif output_format == 'tiff':
+                # TIFF com compressão baseada na qualidade
+                compression = 'jpeg' if quality < 95 else 'lzw'
+                if compression == 'jpeg' and img.mode in ('RGBA', 'LA'):
+                    background = Image.new('RGB', img.size, (255, 255, 255))
+                    background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+                    img = background
+                img.save(output, format='TIFF', compression=compression, quality=quality if compression == 'jpeg' else None)
+                print(f"TIFF salvo com compressão: {compression}, qualidade: {quality}")  # Debug
+                
             else:
-                img.save(output, format=output_format.upper(), quality=quality)
-            
+                # Formato genérico
+                img.save(output, format=output_format.upper())
+                
             mimetype = f'image/{output_format}'
             ext = output_format
 
@@ -107,6 +144,8 @@ def upload_file():
         filename_base = os.path.splitext(file.filename)[0]
         output_filename = f'{filename_base}_vetorizado.{ext}'
         
+        print(f"Arquivo final: {output_filename}, tamanho: {len(output.getvalue())} bytes")  # Debug
+        
         return send_file(
             output,
             mimetype=mimetype,
@@ -115,6 +154,7 @@ def upload_file():
         )
         
     except Exception as e:
+        print(f"ERRO: {str(e)}")  # Debug
         return jsonify({'error': f'Erro no processamento: {str(e)}'}), 500
 
 def image_to_svg_advanced(img, params):
