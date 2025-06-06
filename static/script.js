@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const imagePreview = document.getElementById('imagePreview');
     const processBtn = document.getElementById('processBtn');
     const resultSection = document.getElementById('resultSection');
+    const processInfo = document.getElementById('processInfo');
 
     // Sliders e seus valores
     const sliders = {
@@ -29,8 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     displayValue += 'x';
                 } else if (key === 'quality') {
                     displayValue += '%';
-                    // Adicionar feedback visual da qualidade
                     updateQualityFeedback(this.value);
+                    document.getElementById('currentQuality').textContent = this.value;
                 } else if (key === 'contrast' || key === 'brightness' || key === 'saturation') {
                     displayValue = parseFloat(this.value).toFixed(1);
                 }
@@ -40,16 +41,23 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function updateQualityFeedback(qualityValue) {
-        const qualitySlider = document.querySelector('.quality-slider');
-        qualitySlider.classList.remove('quality-low', 'quality-medium', 'quality-high');
+        const qualityDescription = document.getElementById('qualityDescription');
+        const quality = parseInt(qualityValue);
         
-        if (qualityValue <= 30) {
-            qualitySlider.classList.add('quality-low');
-        } else if (qualityValue <= 70) {
-            qualitySlider.classList.add('quality-medium');
+        let description = '';
+        if (quality <= 20) {
+            description = '🔴 Qualidade Muito Baixa - Arquivo muito pequeno, baixa definição';
+        } else if (quality <= 40) {
+            description = '🟠 Qualidade Baixa - Arquivo pequeno, definição reduzida';
+        } else if (quality <= 60) {
+            description = '🟡 Qualidade Média - Balance entre tamanho e definição';
+        } else if (quality <= 80) {
+            description = '🟢 Qualidade Alta - Arquivo maior, boa definição';
         } else {
-            qualitySlider.classList.add('quality-high');
+            description = '🔵 Qualidade Máxima - Arquivo grande, excelente definição';
         }
+        
+        qualityDescription.textContent = description;
     }
 
     // Drag and drop functionality
@@ -85,13 +93,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Validar tipo de arquivo
         const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/bmp', 'image/gif', 'image/tiff', 'image/webp'];
         if (!allowedTypes.includes(file.type)) {
-            alert('Tipo de arquivo não suportado! Use PNG, JPG, BMP, GIF, TIFF ou WebP.');
+            alert('❌ Tipo de arquivo não suportado! Use PNG, JPG, BMP, GIF, TIFF ou WebP.');
             return;
         }
 
         // Validar tamanho (16MB)
         if (file.size > 16 * 1024 * 1024) {
-            alert('Arquivo muito grande! Máximo permitido: 16MB.');
+            alert('❌ Arquivo muito grande! Máximo permitido: 16MB.');
             return;
         }
 
@@ -101,10 +109,10 @@ document.addEventListener('DOMContentLoaded', function() {
             img.onload = function() {
                 imagePreview.innerHTML = `
                     <img src="${e.target.result}" alt="Preview">
-                    <div style="margin-top: 10px; text-align: left;">
+                    <div style="margin-top: 15px; text-align: left;">
                         <p><strong>📄 Arquivo:</strong> ${file.name}</p>
                         <p><strong>📏 Dimensões:</strong> ${img.width} × ${img.height} pixels</p>
-                        <p><strong>💾 Tamanho:</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                        <p><strong>💾 Tamanho Original:</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
                         <p><strong>🎨 Tipo:</strong> ${file.type}</p>
                     </div>
                 `;
@@ -120,25 +128,33 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         if (!fileInput.files[0]) {
-            alert('Por favor, selecione uma imagem primeiro!');
+            alert('❌ Por favor, selecione uma imagem primeiro!');
             return;
         }
 
         const formData = new FormData(form);
+        const qualityValue = document.getElementById('quality').value;
         
-        // Debug: mostrar valores enviados
-        console.log('Valores sendo enviados:');
+        // GARANTIR QUE A QUALIDADE SEJA ENVIADA
+        formData.set('quality', qualityValue);
+        
+        // Debug detalhado
+        console.log('=== DADOS SENDO ENVIADOS ===');
         for (let [key, value] of formData.entries()) {
-            console.log(key + ': ' + value);
+            console.log(`${key}: ${value}`);
         }
         
         // Mostrar loading
         processBtn.disabled = true;
-        processBtn.querySelector('.btn-text').textContent = 'Processando...';
+        processBtn.querySelector('.btn-text').textContent = 'PROCESSANDO...';
         processBtn.querySelector('.loading-spinner').style.display = 'block';
+        processInfo.style.display = 'block';
+        processInfo.innerHTML = `Processando com qualidade <strong>${qualityValue}%</strong>...`;
 
         // Esconder resultado anterior
         resultSection.style.display = 'none';
+
+        const startTime = Date.now();
 
         fetch('/upload', {
             method: 'POST',
@@ -154,23 +170,34 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .then(blob => {
+            const endTime = Date.now();
+            const processingTime = ((endTime - startTime) / 1000).toFixed(1);
+            
             const url = URL.createObjectURL(blob);
-            const filename = getFilename(fileInput.files[0].name, document.getElementById('format').value);
+            const filename = getFilename(fileInput.files[0].name, document.getElementById('format').value, qualityValue);
             const fileSize = (blob.size / 1024 / 1024).toFixed(2);
+            const originalSize = (fileInput.files[0].size / 1024 / 1024).toFixed(2);
+            const compressionRatio = ((1 - blob.size / fileInput.files[0].size) * 100).toFixed(1);
             
             resultSection.innerHTML = `
-                <h2>✅ Resultado</h2>
+                <h2>✅ Vetorização Concluída com Sucesso!</h2>
                 <div class="result-card">
-                    <div style="font-size: 3em; margin-bottom: 15px;">🎉</div>
-                    <h3>Vetorização concluída com sucesso!</h3>
-                    <div style="margin: 20px 0; text-align: left;">
-                        <p><strong>📄 Arquivo:</strong> ${filename}</p>
-                        <p><strong>💾 Tamanho:</strong> ${fileSize} MB</p>
-                        <p><strong>🎯 Qualidade aplicada:</strong> ${document.getElementById('quality').value}%</p>
-                        <p><strong>🕒 Processado em:</strong> ${new Date().toLocaleTimeString()}</p>
+                    <div style="font-size: 4em; margin-bottom: 20px;">🎉</div>
+                    <h3 style="color: #4CAF50; margin-bottom: 20px;">Arquivo processado com qualidade ${qualityValue}%</h3>
+                    
+                    <div style="margin: 25px 0; text-align: left; background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                        <h4 style="margin-bottom: 15px; color: #333;">📊 Estatísticas do Processamento:</h4>
+                        <p><strong>📄 Arquivo Final:</strong> ${filename}</p>
+                        <p><strong>💾 Tamanho Original:</strong> ${originalSize} MB</p>
+                        <p><strong>💾 Tamanho Final:</strong> ${fileSize} MB</p>
+                        <p><strong>📊 Taxa de Compressão:</strong> ${compressionRatio > 0 ? compressionRatio : 0}%</p>
+                        <p><strong>🎯 Qualidade Aplicada:</strong> ${qualityValue}%</p>
+                        <p><strong>⏱️ Tempo de Processamento:</strong> ${processingTime}s</p>
+                        <p><strong>🕒 Concluído em:</strong> ${new Date().toLocaleTimeString()}</p>
                     </div>
+                    
                     <a href="${url}" download="${filename}" class="download-btn">
-                        📥 Download da Imagem Vetorizada
+                        📥 DOWNLOAD DA IMAGEM VETORIZADA
                     </a>
                 </div>
             `;
@@ -178,22 +205,23 @@ document.addEventListener('DOMContentLoaded', function() {
             resultSection.scrollIntoView({ behavior: 'smooth' });
         })
         .catch(error => {
-            alert('❌ Erro: ' + error.message);
-            console.error('Erro no processamento:', error);
+            alert('❌ Erro no processamento: ' + error.message);
+            console.error('Erro detalhado:', error);
         })
         .finally(() => {
             // Esconder loading
             processBtn.disabled = false;
-            processBtn.querySelector('.btn-text').textContent = '🚀 Vetorizar Imagem';
+            processBtn.querySelector('.btn-text').textContent = '🚀 VETORIZAR IMAGEM';
             processBtn.querySelector('.loading-spinner').style.display = 'none';
+            processInfo.style.display = 'none';
         });
     });
 
-    function getFilename(originalName, format) {
+    function getFilename(originalName, format, quality) {
         const baseName = originalName.split('.').slice(0, -1).join('.');
-        return `${baseName}_vetorizado.${format}`;
+        return `${baseName}_vetorizado_q${quality}.${format}`;
     }
 
     // Inicializar feedback da qualidade
-    updateQualityFeedback(80);
+    updateQualityFeedback(50);
 });
